@@ -1,1 +1,19 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+body{
+	font-family: 'Open Sans', sans-serif;
+	background: #F4F5F6;
+	font-size: 12px;
+	color: #28323C;
+	font-weight: 400;
+	line-height: 18px;
+}
+
+h1, h2, h3, p, ul, li{
+	padding: 0px;
+	margin: 0px;
+	list-style: none;
+}
+
+@mixin row-space-between {
+}

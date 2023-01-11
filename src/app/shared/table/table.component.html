@@ -1,0 +1,82 @@
+<div class="wrapper">
+	<table>
+		<thead>
+		    <tr>
+		        <th></th>
+		        <th style="padding-left: 62px;">sort</th>
+		        <th>sort</th>
+		        <th>sort</th>
+		    </tr>
+		</thead>
+	    <tbody>
+		    <ng-container *ngFor="let row of data">
+			    <tr class="row" [ngClass]="{expanded: row.expanded}">
+			        <td>
+			        	<div class="flex-column">
+				        	<h1 class="title" (click)="expand(row)">
+				        		{{row.title}}
+				        		<img src="/assets/images/arrow-down.svg" class="arrow" [ngClass]="{rotate: row.expanded}" />
+				        	</h1>
+				        	<div class="status">
+				        		<span *ngIf="row.status == 'production'">Production</span>
+				        		<span class="duration">{{row.duration}}</span>
+				        	</div>
+			        	</div>
+			        </td>
+			        <td>
+			        	<div class="flex-row">
+			        		<img src="/assets/images/package.svg">
+			        		<div class="flex-column" style="margin-left: 24px;">
+			        			<b>{{row.pieces_per_min}}</b>
+			        			<p class="label">Pieces per min</p>
+			        		</div>
+			        	</div>
+			        </td>
+			        <td>
+		        		<div class="flex-column">
+		        			<b>{{row.machine_rejects}}</b>
+		        			<p class="label">Machine rejects</p>
+		        		</div>
+			        </td>
+			        <td>
+			        	<div class="flex-row">
+			        		<div>
+			        			<img src="/assets/images/doughnut.png">
+			        		</div>
+			        		<div class="flex-column">
+			        			<div class="flex-row">
+			        				<ul style="margin-bottom: 14px;">
+			        					<li>
+			        						<img src="/assets/images/play.svg"> <b>{{row.chart.running}}</b>
+			        					</li>
+			        					<li>
+			        						<img src="/assets/images/warning.svg"> <b>{{row.chart.failed}}</b>
+			        					</li>
+			        					<li>
+			        						<img src="/assets/images/wifix.svg"> <b>{{row.chart.disconnected}}</b>
+			        					</li>
+			        				</ul>
+			        			</div>
+			        			<div class="flex-row">
+			        				<ul>
+			        					<li>
+			        						<img src="/assets/images/hourglass.svg"> <b>{{row.chart.waiting}}</b>
+			        					</li>
+			        					<li>
+			        						<img src="/assets/images/xcircle.svg"> <b>{{row.chart.canceled}}</b>
+			        					</li>
+			        				</ul>
+			        			</div>
+			        		</div>
+			        	</div>
+			        </td>
+			    </tr>
+			    <tr *ngIf="row.expanded">
+			        <td colspan="4">
+			        	<app-subtable [params]="row"></app-subtable>
+			        </td>
+			    </tr>
+		    </ng-container>
+	    </tbody>
+	</table>
+</div>
