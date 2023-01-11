@@ -7,6 +7,53 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
+  data = [{
+    id: 1,
+    expanded: true,
+    title: "Flow Wrapper",
+    status: "production",
+    duration: "4h 31m",
+    pieces_per_min: 134,
+    machine_rejects: "2,6%",
+    chart: {
+      running: "78%",
+      failed: "2%",
+      disconnected: "0%",
+      waiting: "34%",
+      canceled: "12%",
+    }
+  },{
+    id: 2,
+    expanded: false,
+    title: "Lucika Flow",
+    status: "production",
+    duration: "3h 23m",
+    pieces_per_min: 156,
+    machine_rejects: "1,3%",
+    chart: {
+      running: "78%",
+      failed: "2%",
+      disconnected: "0%",
+      waiting: "34%",
+      canceled: "12%",
+    }
+  },{
+    id: 3,
+    expanded: false,
+    title: "Another Flow",
+    status: "production",
+    duration: "2h 11m",
+    pieces_per_min: 144,
+    machine_rejects: "0,6%",
+    chart: {
+      running: "78%",
+      failed: "2%",
+      disconnected: "0%",
+      waiting: "34%",
+      canceled: "12%",
+    }
+  }]
+
   constructor() { }
 
   ngOnInit(): void {

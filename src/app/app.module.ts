@@ -7,7 +7,7 @@ import { DashboardComponent } from './modules/dashboard/dashboard.component';
 import { TableComponent } from './shared/table/table.component';
 import { SubtableComponent } from './shared/subtable/subtable.component';
 
-// import { ChartModule } from 'angular-highcharts';
+import { HighchartsChartModule } from 'highcharts-angular';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,7 @@ import { SubtableComponent } from './shared/subtable/subtable.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    // ChartModule
+    HighchartsChartModule
   ],
   providers: [],
   bootstrap: [AppComponent]

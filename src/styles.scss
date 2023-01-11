@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
+*{
+	box-sizing: border-box;
+	padding: 0px;
+	margin: 0px;
+	list-style: none;
+}
+
 body{
 	font-family: 'Open Sans', sans-serif;
 	background: #F4F5F6;
@@ -7,12 +14,6 @@ body{
 	color: #28323C;
 	font-weight: 400;
 	line-height: 18px;
-}
-
-h1, h2, h3, p, ul, li{
-	padding: 0px;
-	margin: 0px;
-	list-style: none;
 }
 
 @mixin row-space-between {
