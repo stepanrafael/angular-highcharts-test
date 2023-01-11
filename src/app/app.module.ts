@@ -8,18 +8,22 @@ import { TableComponent } from './shared/table/table.component';
 import { SubtableComponent } from './shared/subtable/subtable.component';
 
 import { HighchartsChartModule } from 'highcharts-angular';
+import { NgChartsModule } from 'ng2-charts';
+import { MiniPieComponent } from './shared/mini-pie/mini-pie.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
     TableComponent,
-    SubtableComponent
+    SubtableComponent,
+    MiniPieComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HighchartsChartModule
+    HighchartsChartModule,
+    NgChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
