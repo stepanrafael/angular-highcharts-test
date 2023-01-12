@@ -13,7 +13,14 @@ export class TableComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  accordion = true;
   expand(row){
-    row.expanded = !row.expanded;
+    if(this.accordion){
+      this.params.forEach((item)=>{
+        item.expanded = row.id !== item.id ? false : !item.expanded;
+      });
+    }else{
+      row.expanded = !row.expanded;
+    }
   }
 }

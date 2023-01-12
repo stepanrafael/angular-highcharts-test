@@ -13,19 +13,18 @@ HC_timeline(Highcharts);
 })
 export class SubtableComponent implements OnInit {
   @Input('params') params: any;
-
   Highcharts: typeof Highcharts = Highcharts;
-
   chartOptions: any;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
     console.log("Subtable for :: ", this.params);
 
     this.chartOptions = {
       chart: {
-        type: 'timeline',
+        type: 'line',
         animation: false
       },
       title: {
@@ -34,13 +33,13 @@ export class SubtableComponent implements OnInit {
       subtitle: {
         text: ""
       },
-      xAxis: {
+      xAxis: [{
+        visible: true,
         crosshair: {
           width: 1,
           color: "#415D77",
           dashStyle: "Dash"
         },
-        visible: true,
         labels: {
           staggerLines: 1,
           enabled: true,
@@ -48,9 +47,8 @@ export class SubtableComponent implements OnInit {
               return Highcharts.dateFormat('%H:%M', arg.value);
           }
         },
-        top: 0,
-        offset: 20
-      },
+        height: "100%"
+      }],
       yAxis: {
         tickInterval: 60,
         gridLineColor: "#F3F3F3",
@@ -117,67 +115,68 @@ export class SubtableComponent implements OnInit {
           `;
         }
       },
-      series: [{
-        data: (()=>{
-          let data = this.getData();
-          return data.map(i => ({
-            x: i.date,
-            marker: {
-              height: 20,
-              fillColor: (()=>{
-                if(i.failed == i.packed){
-                  return '#FFBF00';
-                }if(i.failed){
-                  return '#BA253C';
-                }else if(i.packed){
-                  return '#008E62';
-                }else{
-                  return '#fff';
-                }
-              })()
-            }
-          }));
-        })()
-      }]
+      series: []
     };
 
-    HC_exporting(Highcharts);
+    // Add timeline
+    this.chartOptions.series.push({
+      type: "timeline",
+      data: (()=>{
+        let data = this.getData();
+        return data.map(i => ({
+          x: i.date,
+          marker: {
+            height: 20,
+            fillColor: (()=>{
+              if(i.failed == i.packed){
+                return '#FFBF00';
+              }if(i.failed){
+                return '#BA253C';
+              }else if(i.packed){
+                return '#008E62';
+              }else{
+                return '#fff';
+              }
+            })()
+          }
+        }));
+      })()
+    });
 
-      const chart = this.Highcharts.chart('container', this.chartOptions);
-
-      chart.addSeries({
-        type: "line",
-        color: "#7191B1",
-        lineWidth: 4,
-        name: "Pieces per min",
-        marker: {
-          enabled: false
-        },
-        shadow: {
-          color: "rgba(0,0,0,0.15)",
-          width: 15,
-          offsetX: 0,
-          offsetY: 4
-        },
-        data: (()=>{
-          let data = this.getData();
-          return data.map(i => ([i.date, i.packed]));
-        })()
-      });
-      chart.addSeries({
-        type: "line",
-        color: "#FEDFDF",
-        lineWidth: 2,
-        name: "Machine rejects",
-        marker: {
-          enabled: false
-        },
-        shadow: false,
-        data: (()=>{
-          let data = this.getData();
-          return data.map(i => ([i.date, i.failed]));
-        })()
-      });
+    // Add lines
+    this.chartOptions.series.push({
+      type: "line",
+      color: "#7191B1",
+      lineWidth: 4,
+      name: "Pieces per min",
+      marker: {
+        enabled: false
+      },
+      shadow: {
+        color: "rgba(0,0,0,0.15)",
+        width: 15,
+        offsetX: 0,
+        offsetY: 4
+      },
+      data: (()=>{
+        let data = this.getData();
+        return data.map(i => ([i.date, i.packed]));
+      })()
+    })
+    this.chartOptions.series.push({
+      type: "line",
+      color: "#FEDFDF",
+      lineWidth: 2,
+      name: "Machine rejects",
+      marker: {
+        enabled: false
+      },
+      shadow: false,
+      data: (()=>{
+        let data = this.getData();
+        return data.map(i => ([i.date, i.failed]));
+      })()
+    });
   }
 
   getData(){
