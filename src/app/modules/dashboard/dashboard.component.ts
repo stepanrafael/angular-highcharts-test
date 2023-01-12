@@ -9,7 +9,7 @@ export class DashboardComponent implements OnInit {
 
   data = [{
     id: 1,
-    expanded: false,
+    expanded: true,
     title: "Flow Wrapper",
     status: "production",
     duration: "4h 31m",

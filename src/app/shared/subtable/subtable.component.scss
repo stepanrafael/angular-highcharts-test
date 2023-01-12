@@ -6,6 +6,11 @@
 	width: 100%;
 }
 
+::ng-deep .timeline{
+	background: red;
+	padding: 20px;
+}
+
 ::ng-deep .custom-tooltip{
 	width: 280px;
 	background: #fff;

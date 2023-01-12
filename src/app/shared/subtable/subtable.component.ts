@@ -1,5 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import HC_exporting from 'highcharts/modules/exporting';
+import * as timeline from 'highcharts/modules/timeline';
+import HC_timeline from 'highcharts/modules/timeline';
+
+HC_timeline(Highcharts);
 
 @Component({
   selector: 'app-subtable',
@@ -11,72 +16,85 @@ export class SubtableComponent implements OnInit {
 
   Highcharts: typeof Highcharts = Highcharts;
 
-  chartOptions: Highcharts.Options = { 
-    chart: {
-      type: "line"
-    },
-    title: {
-       text: ""
-    },
-    subtitle: {
-       text: ""
-    },
-    xAxis:{
-      gridLineWidth: 1,
-      gridLineColor: "#F3F3F3",
-      gridLineDashStyle: "Dash",
-      crosshair: {
-        width: 1,
-        color: "#415D77",
-        dashStyle: "Dash"
+  chartOptions: any;
+
+  constructor() { }
+
+  ngOnInit(): void {
+    console.log("Subtable for :: ", this.params);
+
+    this.chartOptions = {
+      chart: {
+        type: 'timeline',
+        animation: false
       },
-      lineColor: "#fff",
-      categories: [],
-      visible: false,
-    },
-    yAxis: {
-      tickInterval: 60,
-      gridLineColor: "#F3F3F3",
-      labels: {
-        formatter: function() {
-          if(this.value == 0){
-            return "";
-          }else{
-            return this.value.toString() + "pcs/min";
+      title: {
+        text: ""
+      },
+      subtitle: {
+        text: ""
+      },
+      xAxis: {
+        crosshair: {
+          width: 1,
+          color: "#415D77",
+          dashStyle: "Dash"
+        },
+        visible: true,
+        labels: {
+          staggerLines: 1,
+          enabled: true,
+          formatter: function(arg) {
+              return Highcharts.dateFormat('%H:%M', arg.value);
           }
         },
-        style: {
-          color: "#7E848A"
+        top: 0,
+        offset: 20
+      },
+      yAxis: {
+        tickInterval: 60,
+        gridLineColor: "#F3F3F3",
+        labels: {
+          formatter: function(arg) {
+            if(arg.value == 0){
+              return "";
+            }else{
+              return arg.value.toString() + "pcs/min";
+            }
+          },
+          style: {
+            color: "#7E848A"
+          }
+        },
+        title:{
+          text: ""
+        } 
+      },
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: false
+          }
         }
       },
-      title:{
-        text: ""
-      } 
-    },
-    tooltip: {
-      positioner: function(width, _, point) {
-        console.log(width, _, point);
-        var plotX = point.plotX + width/3;
-        return {
-          x: plotX,
-          y: point.plotY,
-        };
+      exporting: false,
+      legend: {
+        enabled: false
       },
-      outside: false,
-      hideDelay: 0,
-      snap: 1,
-      followPointer: false,
-      useHTML: true,
-      borderRadius: 7,
-      padding: 0,
-      borderColor: "#fff",
-      borderWidth: 0,
-      shadow: false,
-      className: "custom-tooltip",
-      backgroundColor: "#fff",
-      formatter: function(){
-        console.log(this);
-        if(this.point.y && this.point.y > 0){
+      tooltip: {
+        outside: false,
+        hideDelay: 0,
+        snap: 1,
+        followPointer: false,
+        useHTML: true,
+        borderRadius: 7,
+        padding: 0,
+        borderColor: "#fff",
+        borderWidth: 0,
+        shadow: false,
+        className: "custom-tooltip",
+        backgroundColor: "#fff",
+        formatter: function(tooltip, variable){
           return `
             <div class="custom-tooltip">
               <div class="header danger">
@@ -97,54 +115,173 @@ export class SubtableComponent implements OnInit {
               <div class="footer">22.04.2022 ; hh:mm</div>
             </div>
           `;
-        }else{
-          return false;
         }
-      }
-    },
-    legend: {
-      enabled: false
-    },
-    plotOptions: {
-      scatter: {
-        stickyTracking: false
-      }
-    },
-    series: [
-       {
-          type: "line",
-          color: "#7191B1",
-          lineWidth: 4,
-          name: "Pieces per min",
-          data: [0, 120, 20, 150, 160, 140, 130, 70, 20, 100],
-          marker: {
-            enabled: false
-          },
-          shadow: {
-            color: "rgba(0,0,0,0.15)",
-            width: 15,
-            offsetX: 0,
-            offsetY: 4
-          }
-       },
-       {
-          type: "line",
-          color: "#FEDFDF",
-          lineWidth: 2,
-          name: "Machine rejects",
-          data: [0, 20, 50, 70, 10, 0, 10, 20, 30, 0],
-          marker: {
-            enabled: false
-          },
-          shadow: false
-       }
-    ]
-  };
+      },
+      series: [{
+        data: (()=>{
+          let data = this.getData();
+          return data.map(i => ({
+            x: i.date,
+            marker: {
+              height: 20,
+              fillColor: (()=>{
+                if(i.failed == i.packed){
+                  return '#FFBF00';
+                }if(i.failed){
+                  return '#BA253C';
+                }else if(i.packed){
+                  return '#008E62';
+                }else{
+                  return '#fff';
+                }
+              })()
+            }
+          }));
+        })()
+      }]
+    };
 
-  constructor() { }
+    HC_exporting(Highcharts);
 
-  ngOnInit(): void {
-    console.log("Subtable for :: ", this.params);
+      const chart = this.Highcharts.chart('container', this.chartOptions);
+
+      chart.addSeries({
+        type: "line",
+        color: "#7191B1",
+        lineWidth: 4,
+        name: "Pieces per min",
+        marker: {
+          enabled: false
+        },
+        shadow: {
+          color: "rgba(0,0,0,0.15)",
+          width: 15,
+          offsetX: 0,
+          offsetY: 4
+        },
+        data: (()=>{
+          let data = this.getData();
+          return data.map(i => ([i.date, i.packed]));
+        })()
+      });
+      chart.addSeries({
+        type: "line",
+        color: "#FEDFDF",
+        lineWidth: 2,
+        name: "Machine rejects",
+        marker: {
+          enabled: false
+        },
+        shadow: false,
+        data: (()=>{
+          let data = this.getData();
+          return data.map(i => ([i.date, i.failed]));
+        })()
+      });
+  }
+
+  getData(){
+    return [{
+      date: Date.UTC(2022, 1, 1, 15, 0),
+      failed: 0,
+      packed: 20
+    },{
+      date: Date.UTC(2022, 1, 1, 15, 10),
+      failed: 0,
+      packed: 40
+    },{
+      date: Date.UTC(2022, 1, 1, 15, 20),
+      failed: 0,
+      packed: 80
+    },{
+      date: Date.UTC(2022, 1, 1, 15, 30),
+      failed: 20,
+      packed: 150
+    },{
+      date: Date.UTC(2022, 1, 1, 15, 40),
+      failed: 60,
+      packed: 20
+    },{
+      date: Date.UTC(2022, 1, 1, 15, 50),
+      failed: 0,
+      packed: 140
+    },{
+      date: Date.UTC(2022, 1, 1, 16, 0),
+      failed: 0,
+      packed: 160
+    },{
+      date: Date.UTC(2022, 1, 1, 16, 10),
+      failed: 10,
+      packed: 140
+    },{
+      date: Date.UTC(2022, 1, 1, 16, 20),
+      failed: 20,
+      packed: 120
+    },{
+      date: Date.UTC(2022, 1, 1, 16, 30),
+      failed: 30,
+      packed: 110
+    },{
+      date: Date.UTC(2022, 1, 1, 16, 40),
+      failed: 30,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 16, 50),
+      failed: 30,
+      packed: 90
+    },{
+      date: Date.UTC(2022, 1, 1, 17, 0),
+      failed: 30,
+      packed: 60
+    },{
+      date: Date.UTC(2022, 1, 1, 17, 10),
+      failed: 40,
+      packed: 40
+    },{
+      date: Date.UTC(2022, 1, 1, 17, 20),
+      failed: 30,
+      packed: 30
+    },{
+      date: Date.UTC(2022, 1, 1, 17, 30),
+      failed: 20,
+      packed: 20
+    },{
+      date: Date.UTC(2022, 1, 1, 17, 40),
+      failed: 30,
+      packed: 20
+    },{
+      date: Date.UTC(2022, 1, 1, 17, 50),
+      failed: 10,
+      packed: 20
+    },{
+      date: Date.UTC(2022, 1, 1, 18, 0),
+      failed: 0,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 18, 10),
+      failed: 0,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 18, 20),
+      failed: 0,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 18, 30),
+      failed: 0,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 18, 40),
+      failed: 0,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 18, 50),
+      failed: 0,
+      packed: 100
+    },{
+      date: Date.UTC(2022, 1, 1, 19, 0),
+      failed: 0,
+      packed: 100
+    }]
   }
 
 }
