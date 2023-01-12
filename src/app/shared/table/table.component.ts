@@ -13,7 +13,7 @@ export class TableComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  accordion = true;
+  accordion = true; // true / false
   expand(row){
     if(this.accordion){
       this.params.forEach((item)=>{

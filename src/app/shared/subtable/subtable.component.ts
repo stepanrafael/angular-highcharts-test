@@ -14,18 +14,62 @@ HC_timeline(Highcharts);
 export class SubtableComponent implements OnInit {
   @Input('params') params: any;
   Highcharts: typeof Highcharts = Highcharts;
-  chartOptions: any;
 
   constructor() {
+    this.dummyDataSeries(15, 16);
+  }
+  
+  ngOnInit(): void {
+    console.log("SUB TABLE PARAMS :: ", this.params);
+    this.initGraph();
   }
 
-  ngOnInit(): void {
-    console.log("Subtable for :: ", this.params);
+  dataSeries:any = [];
+  dummyDataSeries(hour, endHour){
+    for(let min = 0; min <= 59; min+=1){
+      this.dataSeries.push({
+        packed: (()=>{
+          if(hour == 15 && min < 30){
+            return min * 2;
+          }else if(hour == 15 && min > 30 && hour < 16){
+            return min / 2;
+          }else if(hour == 16 && min > 0 && min < 40){
+            return 150;
+          }else{
+            return 100;
+          }
+        })(),
+        failed: (()=>{
+          if(hour == 15 && min < 30){
+            return min;
+          }else if(hour == 15 && min > 40 && hour < 16){
+            return min / 1;
+          }else if(hour == 15 && min > 30 && hour < 16){
+            return min / 2;
+          }else if(hour == 16 && min > 0 && min < 40){
+            return 20;
+          }else{
+            return 10;
+          }
+        })(),
+        date: Date.UTC(2022, 1, 1, hour, min)
+      });
+      if(min == 59){
+        let nextHour = hour + 1;
+        if(nextHour <= endHour){
+          this.dummyDataSeries(nextHour, endHour);
+        }else{
+          return this.dataSeries;
+        }
+      }
+    }
+  }
 
+  chartOptions;
+  initGraph(){
     this.chartOptions = {
       chart: {
-        type: 'line',
-        animation: false
+        type: "line"
       },
       title: {
         text: ""
@@ -34,6 +78,14 @@ export class SubtableComponent implements OnInit {
         text: ""
       },
       xAxis: [{
+        endOnTick: false,
+        maxPadding: 0.025,
+        minPadding: 0.025,
+        gridLineWidth: 0,
+        tickWidth: 0,
+        lineWidth: 0,
+        type: "datetime",
+        tickInterval: 1800,
         visible: true,
         crosshair: {
           width: 1,
@@ -44,21 +96,17 @@ export class SubtableComponent implements OnInit {
           staggerLines: 1,
           enabled: true,
           formatter: function(arg) {
-              return Highcharts.dateFormat('%H:%M', arg.value);
+            return Highcharts.dateFormat('%H:%M', arg.value);
           }
         },
         height: "100%"
       }],
-      yAxis: {
+      yAxis: [{
         tickInterval: 60,
         gridLineColor: "#F3F3F3",
         labels: {
           formatter: function(arg) {
-            if(arg.value == 0){
-              return "";
-            }else{
-              return arg.value.toString() + "pcs/min";
-            }
+            return arg.value > 0 ? arg.value.toString() + "pcs/min" : "0";
           },
           style: {
             color: "#7E848A"
@@ -66,12 +114,43 @@ export class SubtableComponent implements OnInit {
         },
         title:{
           text: ""
-        } 
-      },
+        },
+        height: "75%" 
+      },{
+        alternateGridColor: "#F9F9FA",
+        gridLineWidth: 1, 
+        gridLineColor: "#EAEBED",
+        top: "80%",
+        height: "20%",
+        labels: {
+          enabled: false
+        },
+        title:{
+          text: ""
+        },
+        className: "timeline",
+      }],
       plotOptions: {
         series: {
+          timeline: {
+            dataLabels: {
+              enabled: true,
+              borderWidth: 0,
+              borderColor: "#fff000",
+            },
+          },
           dataLabels: {
             enabled: false
+          },
+          states: {
+            inactive: {
+                opacity: 1
+            },
+            hover: {
+              halo: {
+                opacity: 0
+              }
+            }
           }
         }
       },
@@ -92,10 +171,12 @@ export class SubtableComponent implements OnInit {
         shadow: false,
         className: "custom-tooltip",
         backgroundColor: "#fff",
-        formatter: function(tooltip, variable){
+        formatter: function(tooltip){
+          // console.log("formtter tooltip : ", tooltip, this);
+          let status = "danger";
           return `
-            <div class="custom-tooltip">
-              <div class="header danger">
+            <div class="custom-tooltip ${status}">
+              <div class="header">
                 <span>Stopped by fault</span>
                 <span class="duration">21min / 2h 45min</span>
               </div>
@@ -115,71 +196,65 @@ export class SubtableComponent implements OnInit {
           `;
         }
       },
-      series: []
+      series: [{
+        type: "timeline",
+        name: "timeline",
+        yAxis: 1,
+        data: (()=>{
+          return this.dataSeries.map(i => ({
+            x: i.date,
+            marker: {
+              lineWidth: 1,
+              height: 50,
+              lineColor: "#F9F9FA",
+              fillColor: (()=>{
+                if(i.failed == i.packed){
+                  return '#FFBF00';
+                }else if(i.failed > i.packed){
+                  return '#BA253C';
+                }else if(i.packed){
+                  return '#008E62';
+                }else{
+                  return "#fff";
+                }
+              })()
+            }
+          }));
+        })()
+      },{
+        type: "line",
+        color: "#7191B1",
+        lineWidth: 4,
+        name: "packed",
+        marker: {
+          enabled: false
+        },
+        shadow: {
+          color: "rgba(0,0,0,0.15)",
+          width: 15,
+          offsetX: 0,
+          offsetY: 4
+        },
+        data: (()=>{
+          return this.dataSeries.map(i => ([i.date, i.packed]));
+        })()
+      },{
+        type: "line",
+        color: "#FEDFDF",
+        lineWidth: 2,
+        name: "failed",
+        marker: {
+          enabled: false
+        },
+        shadow: false,
+        data: (()=>{
+          return this.dataSeries.map(i => ([i.date, i.failed]));
+        })()
+      }]
     };
-
-    // Add timeline
-    this.chartOptions.series.push({
-      type: "timeline",
-      data: (()=>{
-        let data = this.getData();
-        return data.map(i => ({
-          x: i.date,
-          marker: {
-            height: 20,
-            fillColor: (()=>{
-              if(i.failed == i.packed){
-                return '#FFBF00';
-              }if(i.failed){
-                return '#BA253C';
-              }else if(i.packed){
-                return '#008E62';
-              }else{
-                return '#fff';
-              }
-            })()
-          }
-        }));
-      })()
-    });
-
-    // Add lines
-    this.chartOptions.series.push({
-      type: "line",
-      color: "#7191B1",
-      lineWidth: 4,
-      name: "Pieces per min",
-      marker: {
-        enabled: false
-      },
-      shadow: {
-        color: "rgba(0,0,0,0.15)",
-        width: 15,
-        offsetX: 0,
-        offsetY: 4
-      },
-      data: (()=>{
-        let data = this.getData();
-        return data.map(i => ([i.date, i.packed]));
-      })()
-    })
-    this.chartOptions.series.push({
-      type: "line",
-      color: "#FEDFDF",
-      lineWidth: 2,
-      name: "Machine rejects",
-      marker: {
-        enabled: false
-      },
-      shadow: false,
-      data: (()=>{
-        let data = this.getData();
-        return data.map(i => ([i.date, i.failed]));
-      })()
-    });
   }
 
-  getData(){
+  dummyDataSet(){
     return [{
       date: Date.UTC(2022, 1, 1, 15, 0),
       failed: 0,
