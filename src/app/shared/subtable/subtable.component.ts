@@ -205,7 +205,6 @@ export class SubtableComponent implements OnInit {
             x: i.date,
             marker: {
               lineWidth: 1,
-              height: 50,
               lineColor: "#F9F9FA",
               fillColor: (()=>{
                 if(i.failed == i.packed){
