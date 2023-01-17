@@ -1,4 +1,7 @@
-# DashboardRafael
+![Sample1](https://raw.githubusercontent.com/stepanrafael/angular-widget-test/master/angular-highcharts.png)
+![Sample2](https://raw.githubusercontent.com/stepanrafael/angular-widget-test/master/widget-tooltip.png)
+
+# Angular & Highcharts Widget Test
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.12.
 
